@@ -8,6 +8,13 @@ module Yuque {
   type @toJSON = (object): string
   type @readJSON = async ($Response): object
 
+  model Config {
+    authToken: string,
+    domain: string
+  }
+
+  init(config: Config);
+
   api get(path: string, params: object): object {
     protocol = 'https';
     method = 'GET';
