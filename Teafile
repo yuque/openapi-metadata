@@ -2,5 +2,5 @@
   "scope": "alipay",
   "name": "Yuque",
   "version": "0.0.1",
-  "main": "./yuque.spec"
+  "main": "./yuque.tea"
 }
