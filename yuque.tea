@@ -7,6 +7,7 @@ module Yuque {
 
   type @toJSON = (object): string
   type @readJSON = async ($Response): object
+  type @toQuery = (object): map[string]string
 
   model Config {
     authToken: string,
@@ -19,9 +20,9 @@ module Yuque {
     protocol = 'https';
     method = 'GET';
     pathname = `${__module.basePath}${path}`;
-    query = {
+    query = @toQuery({
       ...params
-    };
+    });
     headers = {
       host = @domain,
       x-auth-token = @authToken,
@@ -74,15 +75,15 @@ module Yuque {
     return result;
   }
 
-  model Response<T> = {
-    data: T
+  model HelloResponse = {
+    data: Hello
   };
 
   model Hello = {
     message: string
-  };
+  }
 
-  async function hello(): Response<Hello> {
+  async function hello(): HelloResponse {
     return get('/hello', {});
   }
 
@@ -111,18 +112,23 @@ module Yuque {
     updatedAt: string(name="updated_at", description="更新时间")
   }
 
+  model UserResponse {
+    data: User
+  }
+
   /**
    * 获取单个用户信息
    * @param login 用户个人路径
    */
-  async function getUserById(login: string): Response<User> {
+  async function getUserById(login: string): UserResponse {
     return get(`/users/${login}`, {});
   }
+
 
   /**
    * 获取认证的用户的个人信息
    */
-  async function getUser(): Response<User> {
+  async function getUser(): UserResponse {
     return get(`/user`, {});
   }
 
@@ -137,25 +143,37 @@ module Yuque {
     updatedAt: string(name="updated_at", description="更新时间")
   }
 
+  model GroupsResponse {
+    data: [ Group ]
+  }
+
   /**
    * 获取某个用户的加入的组织列表
    * @param login 用户个人路径
    */
-  async function getGroupsByUser(login: string): Response<[Group]> {
+  async function getGroupsByUser(login: string): GroupsResponse {
     return get(`/users/${login}/groups`, {});
+  }
+
+  model UsersResponse {
+    data: [ User ]
   }
 
   /**
    * 获取公开组织列表
    */
-  async function getGroups(): Response<[User]> {
+  async function getGroups(): UsersResponse {
     return get(`/groups`, {});
+  }
+
+  model GroupResponse {
+    data: Group
   }
 
   /**
    * 创建 Group
    */
-  async function createGroup(group: Group): Response<Group> {
+  async function createGroup(group: Group): GroupResponse {
     return post(`/groups`, group);
   }
 
@@ -188,7 +206,7 @@ module Yuque {
   /**
    * 更新团队信息
    */
-  async function updateGroup(groupid: string, params: object): Response<Group> {
+  async function updateGroup(groupid: string, params: object): GroupResponse {
     return put(`/groups/${groupid}`, params);
   }
 
@@ -209,17 +227,25 @@ module Yuque {
     updatedAt: string(name="updated_at", description="更新时间")
   }
 
+  model GroupUsersResponse {
+    data: [ GroupUser ]
+  }
+
   /**
    * 获取组织成员信息
    */
-  async function getGroupMembers(groupid: string): Response<[GroupUser]> {
+  async function getGroupMembers(groupid: string): GroupUsersResponse {
     return get(`/groups/${groupid}/users`, {});
+  }
+
+  model GroupUserResponse {
+    data: GroupUser
   }
 
   /**
    * 更新或创建团队成员
    */
-  async function updateGroupMember(groupid: string, userid: string, params: object): Response<GroupUser> {
+  async function updateGroupMember(groupid: string, userid: string, params: object): GroupUserResponse {
     return put(`/groups/${groupid}/users/${userid}`, params);
   }
 
@@ -247,31 +273,39 @@ module Yuque {
     updatedAt: string(name="updated_at", description="更新时间")
   }
 
+  model BooksResponse {
+    data: [ Book ]
+  }
+
   /**
    * 获取一个用户/团队下的知识库
    */
-  async function getBooksByUser(userid: string, params: object): Response<[Book]> {
+  async function getBooksByUser(userid: string, params: object): BooksResponse {
     return get(`/users/${userid}/repos`, params);
   }
 
   /**
    * 在用户/团队下创建知识库
    */
-  async function createBook(userid: string, params: object): Response<[Book]> {
+  async function createBook(userid: string, params: object): BooksResponse {
     return post(`/groups/${userid}/repos`, params);
+  }
+
+  model BookResponse {
+    data: Book
   }
 
   /**
    * 获取一个知识库详情
    */
-  async function getBook(namespace: string): Response<Book> {
+  async function getBook(namespace: string): BookResponse {
     return get(`/repos/${namespace}`, {});
   }
 
   /**
    * 更新知识库
    */
-  async function updateBook(namespace: string, params: object): Response<Book> {
+  async function updateBook(namespace: string, params: object): BookResponse {
     return put(`/repos/${namespace}`, params);
   }
 
@@ -288,10 +322,14 @@ module Yuque {
     depth: number(description="层级"),
   }
 
+  model BookTocsResponse {
+    data: [ BookToc ]
+  }
+
   /**
    * 获取一个知识库的目录
    */
-  async function getBookToc(namespace: string): Response<[BookToc]> {
+  async function getBookToc(namespace: string): BookTocsResponse {
     return get(`/repos/${namespace}/toc`, {});
   }
 
@@ -300,11 +338,12 @@ module Yuque {
     type?: string
   }
 
+
   /**
    * FIXME: 如何传递 query
    * 搜索知识库
    */
-  async function searchBook(params: SearchQuery): Response<[Book]> {
+  async function searchBook(params: SearchQuery): BooksResponse {
     return get(`/search/repos`, params);
   }
 
@@ -332,31 +371,40 @@ module Yuque {
     updatedAt: string(name="updated_at", description="更新时间"),
   }
 
+  model DocsResponse {
+    data: [ Doc ]
+  }
+
+  model DocResponse {
+    data: Doc
+  }
+
   /**
    * 获取知识库下文档列表
    */
-  async function getDocs(namespace: string): Response<[Doc]> {
+  async function getDocs(namespace: string): DocsResponse {
     return get(`/repos/${namespace}/docs`, {});
   }
 
   /**
    * 获取单篇文档详情
    */
-  async function getDoc(namespace: string, slug: string): Response<Doc> {
+  async function getDoc(namespace: string, slug: string): DocResponse {
     return get(`/repos/${namespace}/docs/${slug}`, {});
   }
+
 
   /**
    * 创建文档
    */
-  async function createDoc(namespace: string, params: object): Response<Doc> {
+  async function createDoc(namespace: string, params: object): DocResponse {
     return post(`/repos/${namespace}/docs`, params);
   }
 
   /**
    * 更新文档
    */
-  async function updateDoc(namespace: string, slug: string, params: object): Response<Doc> {
+  async function updateDoc(namespace: string, slug: string, params: object): DocResponse {
     return put(`/repos/${namespace}/docs/${slug}`, params);
   }
 
