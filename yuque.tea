@@ -12,7 +12,10 @@ module Yuque {
     domain: string
   }
 
-  init(config: Config);
+  init(config: Config) {
+    @authToken = config.authToken;
+    @domain = config.domain;
+  }
 
   api get(path: string, params: object): object {
     protocol = 'https';
