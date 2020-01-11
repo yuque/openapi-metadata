@@ -1,13 +1,11 @@
+import YuqueUtil;
+
 module Yuque {
 
   prop basePath = "/api/v2";
 
   type @domain = string
   type @authToken = string
-
-  type @toJSON = (object): string
-  type @readJSON = async ($Response): object
-  type @toQuery = (object): map[string]string
 
   model Config {
     authToken: string,
@@ -20,7 +18,7 @@ module Yuque {
     protocol = 'https';
     method = 'GET';
     pathname = `${__module.basePath}${path}`;
-    query = @toQuery({
+    query = YuqueUtil.toQuery({
       ...params
     });
     headers = {
@@ -29,7 +27,7 @@ module Yuque {
       user-agent = "tea/nodejs",
     };
   } returns {
-    var result = @readJSON(__response);
+    var result = YuqueUtil.readJSON(__response);
     return result;
   }
 
@@ -41,9 +39,9 @@ module Yuque {
       x-auth-token = @authToken,
       user-agent = "tea/nodejs"
     };
-    body = @toJSON(data);
+    body = YuqueUtil.toJSONString(data);
   } returns {
-    var result = @readJSON(__response);
+    var result = YuqueUtil.readJSON(__response);
     return result;
   }
 
@@ -55,9 +53,9 @@ module Yuque {
       x-auth-token = @authToken,
       user-agent = "tea/nodejs"
     };
-    body = @toJSON(data);
+    body = YuqueUtil.toJSONString(data);
   } returns {
-    var result = @readJSON(__response);
+    var result = YuqueUtil.readJSON(__response);
     return result;
   }
 
@@ -69,9 +67,9 @@ module Yuque {
       x-auth-token = @authToken,
       user-agent = "tea/nodejs"
     };
-    body = @toJSON(data);
+    body = YuqueUtil.toJSONString(data);
   } returns {
-    var result = @readJSON(__response);
+    var result = YuqueUtil.readJSON(__response);
     return result;
   }
 

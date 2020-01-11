@@ -3,6 +3,9 @@
   "name": "Yuque",
   "version": "0.0.1",
   "main": "./yuque.tea",
+  "libraries": {
+    "YuqueUtil": "yuque:YuqueUtil:0.1.0"
+  },
   "java": {
     "package": "com.yuque"
   },

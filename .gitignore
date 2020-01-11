@@ -1,3 +1,5 @@
 java/
 go/
 ts/
+.libraries.json
+libraries/
